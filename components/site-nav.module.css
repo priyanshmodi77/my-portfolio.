@@ -1,0 +1,147 @@
+/* This header lives inside the Hero (rendered by glass-hero.tsx) and is
+   positioned absolute relative to it — it scrolls away naturally with the
+   rest of the Hero rather than staying pinned across the whole page. */
+.header {
+  position: absolute;
+  inset: 0 0 auto 0;
+  z-index: 30;
+  pointer-events: none;
+}
+
+.nav {
+  position: absolute;
+  top: max(2rem, env(safe-area-inset-top));
+  left: max(5.6vw, 2rem);
+  right: max(5.6vw, 2rem);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  animation: fadeInOnly 0.8s var(--ease-signature) 0.15s both;
+}
+
+.nav > * {
+  pointer-events: auto;
+}
+
+/* Brand + links are grouped and kept to the left edge, deliberately clear
+   of the portrait (which sits right-of-centre in the frame) — only the
+   single CTA pill sits on the right. */
+.navGroup {
+  display: flex;
+  align-items: center;
+  gap: clamp(1.5rem, 3vw, 2.75rem);
+  min-width: 0;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  color: var(--ink);
+  text-decoration: none;
+  min-height: 44px;
+  flex-shrink: 0;
+}
+
+.brandName {
+  font-family: var(--font-fragment-mono), monospace;
+  font-size: 0.8rem;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+/* The liquid-glass capsule that houses the nav links as a group — the
+   glass material itself only appears on hover/focus (nothing shown here
+   is "always on"), transitioning in smoothly rather than snapping. */
+.linksGlass {
+  border-radius: 999px;
+  padding: 0.4rem 0.5rem;
+  background: rgba(255, 255, 255, 0);
+  border: 1px solid transparent;
+  box-shadow: none;
+  -webkit-backdrop-filter: blur(0px);
+  backdrop-filter: blur(0px);
+  transition: background 0.4s var(--ease-signature),
+    border-color 0.4s var(--ease-signature),
+    box-shadow 0.4s var(--ease-signature),
+    backdrop-filter 0.4s var(--ease-signature);
+}
+
+.linksGlass:hover,
+.linksGlass:focus-within {
+  background: rgba(255, 255, 255, 0.72);
+  border-color: rgba(10, 13, 18, 0.14);
+  box-shadow: 0 6px 18px rgba(21, 40, 74, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+}
+
+.navLinks {
+  display: flex;
+  align-items: center;
+  gap: clamp(0.85rem, 1.6vw, 1.5rem);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.navLinks a {
+  position: relative;
+  font-family: var(--font-fragment-mono), monospace;
+  font-size: 0.76rem;
+  color: var(--ink);
+  text-decoration: none;
+  padding: 0.55rem 0.6rem;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+}
+
+.navLinks a::after {
+  content: "";
+  position: absolute;
+  left: 0.6rem;
+  right: 0.6rem;
+  bottom: 0.5rem;
+  height: 1px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.35s var(--ease-signature),
+    opacity 0.35s var(--ease-signature);
+  opacity: 0.85;
+}
+
+.navLinks a:hover::after,
+.navLinks a:focus-visible::after {
+  transform: scaleX(1);
+}
+
+.navLinks a[data-active="true"]::after {
+  transform: scaleX(1);
+  opacity: 0.4;
+}
+
+@media (max-width: 1023px) {
+  .linksGlass {
+    display: none;
+  }
+}
+
+.brand:focus-visible,
+.navLinks a:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 3px;
+}
+
+@keyframes fadeInOnly {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}

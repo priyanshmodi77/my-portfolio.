@@ -1,0 +1,118 @@
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.75rem;
+  width: 100%;
+  max-width: 30rem;
+  margin-inline: auto;
+  text-align: left;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.label {
+  font-family: var(--font-fragment-mono), monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+.input,
+.textarea {
+  width: 100%;
+  border: none;
+  border-bottom: 1px solid var(--line);
+  background: transparent;
+  padding: 0.6rem 0.1rem;
+  font-family: var(--font-albert-sans), sans-serif;
+  font-size: 1rem;
+  color: var(--ink);
+  transition: border-color 0.35s var(--ease-signature);
+}
+
+.textarea {
+  resize: vertical;
+  min-height: 4.5rem;
+  line-height: 1.6;
+}
+
+.input:hover,
+.textarea:hover {
+  border-color: rgba(10, 13, 18, 0.35);
+}
+
+.input:focus-visible,
+.textarea:focus-visible {
+  outline: none;
+  border-color: var(--ink);
+}
+
+.submitRow {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-top: 0.25rem;
+}
+
+.submit {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 44px;
+  padding: 0.85rem 1.6rem;
+  font-family: var(--font-fragment-mono), monospace;
+  font-size: 0.78rem;
+  color: var(--paper);
+  background: var(--ink);
+  border: none;
+  border-radius: 999px;
+  cursor: pointer;
+  box-shadow: 0 1px 2px rgba(10, 13, 18, 0.12);
+  transform: translate(var(--magnet-x, 0px), var(--magnet-y, 0px));
+  transition: transform 0.25s var(--ease-signature),
+    box-shadow 0.4s var(--ease-signature);
+}
+
+.submit:hover,
+.submit:focus-visible {
+  transform: translateY(-2px)
+    translate(var(--magnet-x, 0px), var(--magnet-y, 0px));
+  box-shadow: 0 20px 40px -18px rgba(10, 13, 18, 0.55);
+}
+
+.submit:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 3px;
+}
+
+.submitArrow {
+  display: inline-block;
+  transition: transform 0.35s var(--ease-signature);
+}
+
+.submit:hover .submitArrow,
+.submit:focus-visible .submitArrow {
+  transform: translate(2px, -2px);
+}
+
+.submitNote {
+  margin: 0;
+  font-family: var(--font-fragment-mono), monospace;
+  font-size: 0.72rem;
+  color: var(--ink-soft);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .submit {
+    transition: none;
+  }
+}

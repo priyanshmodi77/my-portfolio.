@@ -1,0 +1,209 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --paper: #edf5ff;
+  --ink: #0a0d12;
+  --ink-soft: rgba(10, 13, 18, 0.66);
+  --line: rgba(21, 40, 74, 0.14);
+  --ease-signature: cubic-bezier(0.16, 1, 0.3, 1);
+  --font-albert-sans: "Albert Sans", -apple-system, BlinkMacSystemFont,
+    "Segoe UI", sans-serif;
+  --font-fragment-mono: "Fragment Mono", ui-monospace, SFMono-Regular,
+    Menlo, monospace;
+  --glass-bg: rgba(255, 255, 255, 0.72);
+  --glass-bg-hover: rgba(255, 255, 255, 0.85);
+  --glass-border: rgba(10, 13, 18, 0.14);
+  --glass-blur: 12px;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  min-width: 320px;
+  background: var(--paper);
+  color: var(--ink);
+}
+
+body {
+  font-family: var(--font-albert-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Never disable browser zoom */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* A near-invisible grain texture for a more "expensive" print-like
+   surface, rather than flat digital color. Fixed + pointer-events:none so
+   it never affects layout, scroll, or interaction. */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 999;
+  pointer-events: none;
+  opacity: 0.025;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* ---------- Shared premium button ----------
+   One canonical outline-fill recipe, used by the hero CTA, the nav CTA,
+   and the resume link — so every primary action in the site reads as the
+   same material instead of three near-identical hand-rolled variants.
+   Layered shadow + lift gives it real dimensional weight on hover. */
+
+.btn-outline {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
+  min-height: 44px;
+  padding: 0.85rem 1.5rem;
+  font-family: var(--font-fragment-mono), monospace;
+  font-size: 0.78rem;
+  color: var(--ink);
+  text-decoration: none;
+  background: transparent;
+  border: 1px solid rgba(10, 13, 18, 0.32);
+  border-radius: 999px;
+  box-shadow: 0 1px 2px rgba(10, 13, 18, 0.06);
+  transform: translate(var(--magnet-x, 0px), var(--magnet-y, 0px))
+    translateZ(0);
+  transition: color 0.4s var(--ease-signature),
+    border-color 0.4s var(--ease-signature),
+    box-shadow 0.4s var(--ease-signature),
+    transform 0.25s var(--ease-signature);
+}
+
+.btn-outline::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--ink);
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 0.45s var(--ease-signature);
+}
+
+.btn-outline:hover,
+.btn-outline:focus-visible {
+  color: var(--paper);
+  border-color: var(--ink);
+  transform: translateY(-2px)
+    translate(var(--magnet-x, 0px), var(--magnet-y, 0px)) translateZ(0);
+  box-shadow: 0 18px 34px -16px rgba(10, 13, 18, 0.45),
+    0 4px 10px -4px rgba(10, 13, 18, 0.2);
+}
+
+.btn-outline:hover::before,
+.btn-outline:focus-visible::before {
+  transform: scaleX(1);
+}
+
+.btn-outline:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 3px;
+}
+
+.btn-outline-arrow {
+  display: inline-block;
+  transition: transform 0.35s var(--ease-signature);
+}
+
+.btn-outline:hover .btn-outline-arrow,
+.btn-outline:focus-visible .btn-outline-arrow {
+  transform: translate(3px, -2px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .btn-outline::before {
+    transition: none;
+  }
+}
+
+/* ---------- Liquid glass surface ----------
+   The site's one glass treatment, used selectively: the hero nav's link
+   capsule and the floating social icons. Not applied to primary buttons —
+   those use a solid ink/outline treatment instead so glass stays a
+   deliberate, occasional material rather than a default. */
+
+.glass-surface {
+  position: relative;
+  isolation: isolate;
+  contain: layout paint;
+  transform: translateZ(0);
+  background: rgba(255, 255, 255, 0.72);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(10, 13, 18, 0.14);
+  box-shadow: 0 6px 18px rgba(21, 40, 74, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  transition: background 0.35s var(--ease-signature),
+    box-shadow 0.35s var(--ease-signature);
+}
+
+.glass-surface:hover,
+.glass-surface:focus-visible {
+  background: rgba(255, 255, 255, 0.85);
+  box-shadow: 0 10px 24px rgba(21, 40, 74, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.85);
+}
+
+/* ---------- Scroll reveal ----------
+   A single IntersectionObserver (see components/scroll-reveal.tsx) toggles
+   .reveal-visible on any [data-reveal] element as it enters the viewport.
+   Stagger a group by setting --reveal-delay inline on each item. */
+
+[data-reveal] {
+  opacity: 0;
+  transform: perspective(1200px) translateY(34px) rotateX(10deg);
+  transform-origin: 50% 100%;
+  transition: opacity 0.9s var(--ease-signature),
+    transform 0.9s var(--ease-signature);
+  transition-delay: var(--reveal-delay, 0s);
+  will-change: opacity, transform;
+}
+
+[data-reveal].reveal-visible {
+  opacity: 1;
+  transform: perspective(1200px) translateY(0) rotateX(0deg);
+  transition: opacity 0.9s var(--ease-signature) var(--reveal-delay, 0s),
+    transform 0.9s var(--ease-signature) var(--reveal-delay, 0s),
+    will-change 0s linear calc(var(--reveal-delay, 0s) + 0.9s);
+  will-change: auto;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-reveal] {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+    will-change: auto !important;
+  }
+}
