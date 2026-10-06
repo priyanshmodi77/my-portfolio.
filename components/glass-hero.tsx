@@ -72,6 +72,7 @@ export default function GlassHero() {
 
     const handlePointerDown = (event: PointerEvent) => {
       if (event.pointerType === "mouse") return;
+      userInteractedRef.current = true;
       trackingRef.current = true;
       if (hero.setPointerCapture) {
         try {
@@ -119,16 +120,18 @@ export default function GlassHero() {
 
     frameRef.current = requestAnimationFrame(tick);
 
-    // One-time desktop intro: automatically play the reveal once on load,
-    // then hand off to normal hover control. Skipped on touch/coarse
-    // pointers (mobile keeps its existing tap-driven behavior only) and
-    // under prefers-reduced-motion (no uninvited motion).
+    // One-time intro on every device: automatically play the reveal once on
+    // load — whether the mouse ever moves, or the mobile touch happens
+    // anywhere else on the page (e.g. to scroll) — then hand off to normal
+    // hover/touch control. Only skipped under prefers-reduced-motion (no
+    // uninvited motion).
     const introTimeouts: number[] = [];
     const prefersFinePointer = window.matchMedia(
       "(hover: hover) and (pointer: fine)"
     ).matches;
+    const introRadius = prefersFinePointer ? DESKTOP_RADIUS : MOBILE_RADIUS;
 
-    if (prefersFinePointer && !reduceMotionRef.current) {
+    if (!reduceMotionRef.current) {
       // Aim roughly over the portrait's face rather than the hero's literal
       // center, and set position directly (skipping the lerp) so the mask
       // pulses open in place instead of sliding in from off-screen.
@@ -140,16 +143,16 @@ export default function GlassHero() {
       smoothRef.current.y = introY;
 
       introTimeouts.push(
-        // Always open — even if the user has already moved the mouse for
-        // real by this point, this just re-sets the same target their own
-        // interaction already set, so it's harmless and never overrides
-        // their actual cursor position (which keeps updating independently
-        // via handlePointerMove).
+        // Always open — even if the user has already moved the mouse or
+        // touched for real by this point, this just re-sets the same
+        // target their own interaction already set, so it's harmless and
+        // never overrides their actual cursor/finger position (which keeps
+        // updating independently via handlePointerMove).
         window.setTimeout(() => {
-          targetRadiusRef.current = DESKTOP_RADIUS;
+          targetRadiusRef.current = introRadius;
         }, 700),
         // Only auto-close if the user still hasn't genuinely interacted —
-        // otherwise this would yank the mask shut mid-hover.
+        // otherwise this would yank the mask shut mid-hover/mid-touch.
         window.setTimeout(() => {
           if (!userInteractedRef.current) {
             targetRadiusRef.current = 0;
