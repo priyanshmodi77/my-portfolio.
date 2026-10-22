@@ -12,6 +12,7 @@ const LINKS = [
     href: "https://www.linkedin.com/in/priyansh-modi-05339630a",
   },
   { label: "Email", href: "mailto:priyansh.modi.in@gmail.com" },
+  { label: "+91 908128 3777", href: "tel:+919081283777" },
 ];
 
 export default function Contact() {
