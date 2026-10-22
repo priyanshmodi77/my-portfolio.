@@ -7,6 +7,7 @@ import { useMagnetic } from "./use-magnetic";
 
 const DESKTOP_RADIUS = 235;
 const MOBILE_RADIUS = 150;
+const MOBILE_INTRO_RADIUS = 300;
 
 const POSITION_LERP = 0.14;
 const RADIUS_LERP = 0.12;
@@ -26,7 +27,6 @@ export default function GlassHero() {
 
   const exploreMagnetic = useMagnetic<HTMLAnchorElement>();
 
-  // Pointer and reveal animation state.
   const rawRef = useRef({ x: -999, y: -999 });
   const smoothRef = useRef({ x: -999, y: -999 });
 
@@ -37,9 +37,6 @@ export default function GlassHero() {
   const frameRef = useRef<number | null>(null);
 
   const reduceMotionRef = useRef(false);
-  const userInteractedRef = useRef(false);
-
-  // Manual interaction remains disabled during the intro.
   const introPlayingRef = useRef(true);
 
   useEffect(() => {
@@ -60,6 +57,14 @@ export default function GlassHero() {
 
     motionQuery.addEventListener("change", handleMotionChange);
 
+    const isMobilePortrait = window.matchMedia(
+      "(max-width: 767px) and (orientation: portrait)"
+    ).matches;
+
+    const prefersFinePointer = window.matchMedia(
+      "(hover: hover) and (pointer: fine)"
+    ).matches;
+
     const setPoint = (clientX: number, clientY: number) => {
       const rect = hero.getBoundingClientRect();
 
@@ -78,10 +83,9 @@ export default function GlassHero() {
       if (event.pointerType !== "mouse") return;
       if (introPlayingRef.current) return;
 
-      userInteractedRef.current = true;
       hideHint();
-
       setPoint(event.clientX, event.clientY);
+
       targetRadiusRef.current = DESKTOP_RADIUS;
     };
 
@@ -89,9 +93,7 @@ export default function GlassHero() {
       if (introPlayingRef.current) return;
 
       if (event.pointerType === "mouse") {
-        userInteractedRef.current = true;
         hideHint();
-
         setPoint(event.clientX, event.clientY);
         return;
       }
@@ -113,9 +115,7 @@ export default function GlassHero() {
       if (event.pointerType === "mouse") return;
       if (introPlayingRef.current) return;
 
-      userInteractedRef.current = true;
       hideHint();
-
       trackingRef.current = true;
 
       if (hero.setPointerCapture) {
@@ -147,7 +147,7 @@ export default function GlassHero() {
     hero.addEventListener("pointerup", endTouch);
     hero.addEventListener("pointercancel", endTouch);
 
-    // Smoothly animate the reveal mask.
+    // Smooth reveal animation.
     const tick = () => {
       if (disposed) return;
 
@@ -169,8 +169,6 @@ export default function GlassHero() {
         (targetRadiusRef.current - radiusRef.current) *
         radiusFactor;
 
-      const clampedRadius = Math.max(radiusRef.current, 0);
-
       hero.style.setProperty(
         "--reveal-x",
         `${smoothRef.current.x}px`
@@ -183,7 +181,7 @@ export default function GlassHero() {
 
       hero.style.setProperty(
         "--reveal-radius",
-        `${clampedRadius}px`
+        `${Math.max(radiusRef.current, 0)}px`
       );
 
       frameRef.current = requestAnimationFrame(tick);
@@ -193,40 +191,30 @@ export default function GlassHero() {
 
     const introTimeouts: number[] = [];
 
-    const prefersFinePointer = window.matchMedia(
-      "(hover: hover) and (pointer: fine)"
-    ).matches;
-
-    const introRadius = prefersFinePointer
-      ? DESKTOP_RADIUS
-      : MOBILE_RADIUS;
+    const introRadius = isMobilePortrait
+      ? MOBILE_INTRO_RADIUS
+      : prefersFinePointer
+        ? DESKTOP_RADIUS
+        : MOBILE_RADIUS;
 
     if (reduceMotionRef.current) {
-      // Respect the system accessibility preference.
       introPlayingRef.current = false;
       targetRadiusRef.current = 0;
     } else {
-      // Lock manual controls as soon as the hero mounts.
+      // Disable manual interaction during automatic reveal.
       introPlayingRef.current = true;
 
-      // Start the automatic reveal after 700 ms.
       introTimeouts.push(
         window.setTimeout(() => {
           if (disposed) return;
 
-          const isMobilePortrait = window.matchMedia(
-            "(max-width: 767px) and (orientation: portrait)"
-          ).matches;
-
-          // Mobile portrait gets its own reveal position.
+          // Mobile-specific reveal centre.
           const introX =
-            hero.clientWidth * (isMobilePortrait ? 0.5 : 0.58);
+            hero.clientWidth * (isMobilePortrait ? 0.58 : 0.58);
 
           const introY =
-            hero.clientHeight * (isMobilePortrait ? 0.36 : 0.42);
+            hero.clientHeight * (isMobilePortrait ? 0.45 : 0.42);
 
-          // Set a consistent starting position independent
-          // of cursor movement elsewhere on the screen.
           rawRef.current.x = introX;
           rawRef.current.y = introY;
 
@@ -237,7 +225,7 @@ export default function GlassHero() {
           targetRadiusRef.current = introRadius;
         }, INTRO_START_DELAY),
 
-        // Enable manual control immediately after the intro.
+        // Enable manual interaction when the intro finishes.
         window.setTimeout(() => {
           if (disposed) return;
 
