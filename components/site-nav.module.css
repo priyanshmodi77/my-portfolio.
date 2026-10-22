@@ -10,9 +10,9 @@
 
 .nav {
   position: absolute;
-  top: max(2rem, env(safe-area-inset-top));
+ top: max(calc(2rem - 12px), env(safe-area-inset-top));
   left: max(5.6vw, 2rem);
-  right: max(5.6vw, 2rem);
+  right: max(calc(5.6vw - 28px), calc(2rem - 28px));
   display: flex;
   align-items: center;
   justify-content: space-between;
