@@ -26,21 +26,20 @@ export default function GlassHero() {
 
   const exploreMagnetic = useMagnetic<HTMLAnchorElement>();
 
-  // Reveal animation state.
+  // Pointer and reveal animation state.
   const rawRef = useRef({ x: -999, y: -999 });
   const smoothRef = useRef({ x: -999, y: -999 });
 
   const radiusRef = useRef(0);
   const targetRadiusRef = useRef(0);
 
-  // Interaction and animation state.
   const trackingRef = useRef(false);
   const frameRef = useRef<number | null>(null);
 
   const reduceMotionRef = useRef(false);
   const userInteractedRef = useRef(false);
 
-  // Manual interaction stays disabled until the intro finishes.
+  // Manual interaction remains disabled during the intro.
   const introPlayingRef = useRef(true);
 
   useEffect(() => {
@@ -74,7 +73,7 @@ export default function GlassHero() {
       }
     };
 
-    // Desktop mouse enters the hero.
+    // Desktop mouse interaction.
     const handlePointerEnter = (event: PointerEvent) => {
       if (event.pointerType !== "mouse") return;
       if (introPlayingRef.current) return;
@@ -86,7 +85,6 @@ export default function GlassHero() {
       targetRadiusRef.current = DESKTOP_RADIUS;
     };
 
-    // Follow the mouse or active touch.
     const handlePointerMove = (event: PointerEvent) => {
       if (introPlayingRef.current) return;
 
@@ -103,7 +101,6 @@ export default function GlassHero() {
       }
     };
 
-    // Close the reveal when the mouse leaves.
     const handlePointerLeave = (event: PointerEvent) => {
       if (event.pointerType !== "mouse") return;
       if (introPlayingRef.current) return;
@@ -125,7 +122,7 @@ export default function GlassHero() {
         try {
           hero.setPointerCapture(event.pointerId);
         } catch {
-          // Pointer capture may not be supported.
+          // Ignore unsupported pointer capture.
         }
       }
 
@@ -150,7 +147,7 @@ export default function GlassHero() {
     hero.addEventListener("pointerup", endTouch);
     hero.addEventListener("pointercancel", endTouch);
 
-    // Smooth reveal animation using requestAnimationFrame.
+    // Smoothly animate the reveal mask.
     const tick = () => {
       if (disposed) return;
 
@@ -204,40 +201,46 @@ export default function GlassHero() {
       ? DESKTOP_RADIUS
       : MOBILE_RADIUS;
 
-    // Respect the user's reduced-motion preference.
     if (reduceMotionRef.current) {
+      // Respect the system accessibility preference.
       introPlayingRef.current = false;
       targetRadiusRef.current = 0;
     } else {
-      // Lock manual interaction immediately on page load.
+      // Lock manual controls as soon as the hero mounts.
       introPlayingRef.current = true;
 
-      // Start the automatic reveal after a short delay.
+      // Start the automatic reveal after 700 ms.
       introTimeouts.push(
         window.setTimeout(() => {
           if (disposed) return;
 
-          const introX = hero.clientWidth * 0.58;
-          const introY = hero.clientHeight * 0.42;
+          const isMobilePortrait = window.matchMedia(
+            "(max-width: 767px) and (orientation: portrait)"
+          ).matches;
 
-          // Start from a predictable position, independent
-          // of any cursor movement elsewhere on the screen.
+          // Mobile portrait gets its own reveal position.
+          const introX =
+            hero.clientWidth * (isMobilePortrait ? 0.5 : 0.58);
+
+          const introY =
+            hero.clientHeight * (isMobilePortrait ? 0.36 : 0.42);
+
+          // Set a consistent starting position independent
+          // of cursor movement elsewhere on the screen.
           rawRef.current.x = introX;
           rawRef.current.y = introY;
 
           smoothRef.current.x = introX;
           smoothRef.current.y = introY;
 
-          // Open the reveal circle.
           radiusRef.current = 0;
           targetRadiusRef.current = introRadius;
         }, INTRO_START_DELAY),
 
-        // Finish the intro and hand control to the user.
+        // Enable manual control immediately after the intro.
         window.setTimeout(() => {
           if (disposed) return;
 
-          // Enable manual control immediately.
           introPlayingRef.current = false;
         }, INTRO_START_DELAY + INTRO_DURATION)
       );
