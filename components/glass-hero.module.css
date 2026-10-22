@@ -548,3 +548,27 @@
     font-size: 0.88rem;
   }
 }
+
+/* Desktop hero: prevent headline and intro overlap */
+
+@media (min-width: 768px) {
+  .headline {
+    top: 30%;
+    left: max(5.6vw, 2rem);
+    right: auto;
+    width: 42%;
+    max-width: 42%;
+    font-size: clamp(4.5rem, 6.2vw, 6.8rem);
+    line-height: 0.93;
+  }
+
+  .bottomLeft {
+    left: max(5.6vw, 2rem);
+    bottom: max(3rem, env(safe-area-inset-bottom));
+    max-width: 32rem;
+  }
+
+  .intro {
+    max-width: 30rem;
+  }
+}
